@@ -1,0 +1,30 @@
+{
+  "name": "liry-blog",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "rspress build",
+    "dev": "rspress dev --port 14985",
+    "format": "prettier --write --cache .",
+    "lint": "eslint .",
+    "preview": "rspress preview"
+  },
+  "dependencies": {
+    "rspress": "^1.40.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.19.0",
+    "@rspress/plugin-shiki": "^1.43.11",
+    "@types/node": "^18.11.17",
+    "@types/react": "^19.1.2",
+    "eslint": "^9.19.0",
+    "globals": "^15.14.0",
+    "prettier": "^3.5.3",
+    "prettier-plugin-organize-imports": "^4.1.0",
+    "prettier-plugin-packagejson": "^2.5.10",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "typescript-eslint": "^8.22.0"
+  }
+}
