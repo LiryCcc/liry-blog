@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { defineConfig } from 'rspress/config';
 
 const rspressConfig = defineConfig({
-  root: join(__dirname, 'docs'),
+  root: join(__dirname, 'src'),
   title: 'Liry Blog',
   builderConfig: {
     output: {
