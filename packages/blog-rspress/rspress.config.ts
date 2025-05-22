@@ -7,7 +7,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const rspressConfig = defineConfig({
   root: join(__dirname, 'docs'),
   title: 'Liry Blog',
-  base: '/blog',
+  base: '/liry-blog',
   themeConfig: {
     socialLinks: [
       {
