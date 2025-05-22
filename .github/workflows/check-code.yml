@@ -1,0 +1,32 @@
+name: code check
+
+on:
+  push:
+    branches: ['main'] # 你可以根据需要修改分支名称
+  pull_request:
+    branches: ['main']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js v22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Check format
+        run: pnpm check-format
+
+      - name: Lint
+        run: pnpm lint
