@@ -5,7 +5,8 @@ import { defineConfig } from 'rspress/config';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const rspressConfig = defineConfig({
-  root: join(__dirname, 'docs'),
+  root: join(__dirname, 'src'),
+  outDir: 'dist',
   title: 'Liry Blog',
   base: process.env.NODE_ENV === 'production' ? '/liry-blog' : undefined,
   themeConfig: {

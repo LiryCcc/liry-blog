@@ -30,8 +30,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# 正常环境变量存下来，
+# local变量不存
+*.local
 
 # vercel
 .vercel

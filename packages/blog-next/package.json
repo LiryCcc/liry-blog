@@ -7,6 +7,7 @@
     "build": "next build",
     "dev": "next dev --port 9721",
     "lint": "next lint",
+    "preview": "pnpm start",
     "start": "next start"
   },
   "dependencies": {

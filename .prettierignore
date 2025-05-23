@@ -3,3 +3,4 @@ pnpm-lock.yaml
 doc_build
 out
 .next
+dist

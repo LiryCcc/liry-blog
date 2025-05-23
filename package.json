@@ -6,6 +6,7 @@
     "dev": "pnpm recursive run dev",
     "format": "prettier --write --cache .",
     "lint": "pnpm recursive run lint",
+    "preview": "pnpm recursive run preview",
     "test": "pnpm recursive run test"
   },
   "devDependencies": {
