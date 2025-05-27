@@ -46,7 +46,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: packages/blog-rspress/doc_build # Rspress 生成的静态文件目录
+          path: packages/blog-rspress/dist # Rspress 生成的静态文件目录
 
   deploy:
     environment:
