@@ -37,11 +37,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Navigate to Rspress project directory
-        run: cd packages/blog-rspress
-
       - name: Build with Rspress
-        run: pnpm run build
+        run: pnpm build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
