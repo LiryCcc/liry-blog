@@ -25,28 +25,25 @@ jobs:
 
       - uses: pnpm/action-setup@v3
         with:
-          version: 8
-          cache: pnpm
+          version: 10
+          # cache: pnpm
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
 
       - name: Install dependencies
         run: pnpm install
 
-      - name: Navigate to Rspress project directory
-        run: cd packages/blog-rspress
-
       - name: Build with Rspress
-        run: pnpm run build
+        run: pnpm build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: packages/blog-rspress/doc_build # Rspress 生成的静态文件目录
+          path: packages/blog-rspress/dist # Rspress 生成的静态文件目录
 
   deploy:
     environment:
