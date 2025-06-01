@@ -11,6 +11,9 @@ const rspressConfig = defineConfig({
   outDir: 'dist',
   title: 'Liry Blog',
   base: process.env.NODE_ENV === 'production' ? '/liry-blog' : undefined,
+  mediumZoom: {
+    selector: ['zoom-img', 'img'].join(' ')
+  },
   themeConfig: {
     lastUpdated: true,
     socialLinks: [

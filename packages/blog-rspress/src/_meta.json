@@ -1,1 +1,7 @@
-[]
+[
+  {
+    "text": "有关PPT",
+    "link": "/ppt/",
+    "activeMatch": "^/ppt/"
+  }
+]
