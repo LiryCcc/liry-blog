@@ -72,6 +72,9 @@ importers:
 
   packages/blog-rspress:
     dependencies:
+      dayjs:
+        specifier: ^1.11.13
+        version: 1.11.13
       rspress:
         specifier: ^1.40.2
         version: 1.44.0(webpack@5.99.9)
@@ -5914,7 +5917,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 18.19.110
+      '@types/node': 20.17.57
       merge-stream: 2.0.0
       supports-color: 8.1.1
 

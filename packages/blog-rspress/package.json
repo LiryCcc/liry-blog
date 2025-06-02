@@ -10,6 +10,7 @@
     "preview": "rspress preview"
   },
   "dependencies": {
+    "dayjs": "^1.11.13",
     "rspress": "^1.40.2"
   },
   "devDependencies": {
