@@ -1,0 +1,48 @@
+# `js`基础
+
+## 数据类型
+
+### 基本数据类型
+
+1. `number` 浮点数，采用IEEE754标准存储，存在精度问题
+2. `string` 字符串类型
+3. `object` 对象类型，包括`NaN`也是`object`，但这是一个bug
+4. `symbol` es6新增，用于表示一个全局唯一量
+
+可以理解为这样的一个类，只是这个类比较特殊，可以当作object的key使用
+
+```ts
+class Symbol {
+  private #sym: string;
+  constructor(sym: string) {
+    this.#sym = sym;
+  }
+  toString() {
+    return `Symbol(${this.#sym})`;
+  }
+}
+```
+
+在`Reflect.oenKeys`和`Object.keys`中的表现不同
+
+前者能获取到`symbol`类型的`key`，后者不行
+```ts
+const symbolThree = Symbol('three');
+const example = {
+  one: 1,
+  two: 2,
+  [symbolThree]: 3,
+  four: 4
+};
+console.log(Reflect.ownKeys(example));
+// 输出 ['one', 'two', 'four', Symbol(three)]
+console.log(Object.keys(example));
+// 输出 ['one', 'two', 'four'];
+```
+
+5. `bigint`
+6. `undefined`
+7. `function`
+8. `boolean`
+
+可以通过`typeof`来获得一个变量的基本数据类型
