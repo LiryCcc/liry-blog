@@ -3,5 +3,10 @@
     "text": "有关PPT",
     "link": "/ppt/",
     "activeMatch": "^/ppt/"
+  },
+  {
+    "text": "面经",
+    "link": "/interview/",
+    "activeMatch": "^/interview/"
   }
 ]
