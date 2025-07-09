@@ -1,13 +1,30 @@
-# `js`基础
+# js基础
 
-## 数据类型
+## 基本数据类型
 
-### 基本数据类型
+### 1. `number` 浮点数，采用IEEE754标准存储，存在精度问题
 
-1. `number` 浮点数，采用IEEE754标准存储，存在精度问题
-2. `string` 字符串类型
-3. `object` 对象类型，包括`NaN`也是`object`，但这是一个bug
-4. `symbol` es6新增，用于表示一个全局唯一量
+```ts
+// 非整数`a` 和 `b`判断相等使用
+const isEqual = a - b <= Number.EPSILON;
+// 整数`a` 和 `b` 判断相逢使用
+const isEqual = a === b;
+```
+
+### 2. `string` 字符串类型
+
+- 可以使用`"`或者`'`括起来
+
+```ts
+const str1 = 'str1';
+console.log('str1');
+// 输出 str1
+```
+- 使用<code>`</code>
+
+### 3. `object` 对象类型，包括`NaN`也是`object`，但这是一个bug
+
+### 4. `symbol` es6新增，用于表示一个全局唯一量
 
 可以理解为这样的一个类，只是这个类比较特殊，可以当作object的key使用
 
@@ -41,9 +58,14 @@ console.log(Object.keys(example));
 // 输出 ['one', 'two', 'four'];
 ```
 
-5. `bigint`
-6. `undefined`
-7. `function`
-8. `boolean`
+### 5. `bigint`
 
-可以通过`typeof`来获得一个变量的基本数据类型
+### 6. `undefined`
+
+### 7. `function`
+
+### 8. `boolean`
+
+`true` or `false`
+
+### 可以通过`typeof`来获得一个变量的基本数据类型
