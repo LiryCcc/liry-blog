@@ -1,4 +1,4 @@
-import { pluginShiki } from '@rspress/plugin-shiki';
+import { createTransformerFocus, createTransformerLineNumber, pluginShiki } from '@rspress/plugin-shiki';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'rspress/config';
@@ -6,7 +6,7 @@ import { defineConfig } from 'rspress/config';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const rspressConfig = defineConfig({
-  plugins: [pluginShiki({})],
+  plugins: [pluginShiki({ transformers: [createTransformerLineNumber(), createTransformerFocus()] })],
   root: join(__dirname, 'src'),
   outDir: 'dist',
   title: 'Liry Blog',
