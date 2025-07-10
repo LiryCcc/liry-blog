@@ -20,6 +20,7 @@ const str1 = 'str1';
 console.log('str1');
 // 输出 str1
 ```
+
 - 使用<code>`</code>
 
 ### 3. `object` 对象类型，包括`NaN`也是`object`，但这是一个bug
@@ -60,12 +61,131 @@ console.log(Object.keys(example));
 
 ### 5. `bigint`
 
+可以存储大整数，定义的时候需要在最后加`n`
+
+```ts
+const bigIntOne = 9007199254740991n;
+const bigIntTwo = 9007199254740992n;
+console.log(bigIntOne + bigIntTwo);
+// 输出 1801439850943000n
+```
+
 ### 6. `undefined`
 
+即未定义的，可以手动赋值，也可以不赋值
+
+```js
+let a;
+console.log(a);
+// 输出 undefined
+
+const b = (c, d) => {
+  console.log(c);
+  console.log(d);
+};
+
+b(1);
+// 由于dd 没有定义，所以输出 undefined
+// 输出 1 undefined
+```
+
 ### 7. `function`
+
+函数类型，包括箭头函数，匿名function，具名function，class
+
+- 箭头函数
+
+```js
+// 箭头函数
+const a = () => {
+  console.log('hello world');
+};
+typeof a;
+// 输出 function
+
+// 箭头函数字面量
+typeof (() => {
+  console.log('hello world');
+});
+// 输出 function
+```
+
+- 匿名函数
+
+```js
+// 匿名函数
+const b = function () {
+  console.log('hello world');
+};
+
+typeof b;
+// 输出 function
+
+// 匿名函数字面量
+typeof function () {};
+// 输出 function
+```
+
+- 具名函数
+
+```js
+// 具名函数
+function c() {
+  console.log('hello world');
+}
+
+typeof c;
+// 输出 function
+
+// 具名函数字面量
+typeof function c() {};
+// 输出 function
+```
+
+- 具名类
+
+```js
+// 具名类
+class D {
+  constructor() {
+    console.log('hello world');
+  }
+}
+
+typeof D;
+// 输出 function
+
+typeof class A {};
+// 输出 function
+```
+
+- 匿名类
+
+```js
+// 匿名类
+const D = class {
+  constructor() {
+    console.log('hello world');
+  }
+};
+typeof D;
+// 输出 function
+
+// 字面量类
+typeof class {
+  constructor() {
+    console.log('hello world');
+  }
+};
+// 输出 function
+```
 
 ### 8. `boolean`
 
 `true` or `false`
 
 ### 可以通过`typeof`来获得一个变量的基本数据类型
+
+```
+
+```
