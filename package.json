@@ -2,7 +2,7 @@
   "type": "module",
   "scripts": {
     "build": "pnpm recursive run build",
-    "check-format": "prettier --check --cache .",
+    "check-format": "prettier --check --cache . && cspell .",
     "dev": "pnpm recursive run dev",
     "format": "prettier --write --cache .",
     "lint": "pnpm recursive run lint",
@@ -10,6 +10,8 @@
     "test": "pnpm recursive run test"
   },
   "devDependencies": {
+    "@types/node": "^22.16.3",
+    "cspell": "^9.1.5",
     "prettier": "^3.6.2",
     "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-packagejson": "^2.5.18"
