@@ -16,7 +16,8 @@ const cspellConfig = defineConfig({
       .filter((v) => {
         return !v.startsWith('#');
       })
-  ]
+  ],
+  words: ['Liskov']
 });
 
 export default cspellConfig;
