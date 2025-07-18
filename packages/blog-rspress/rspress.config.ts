@@ -14,6 +14,13 @@ const rspressConfig = defineConfig({
   mediumZoom: {
     selector: ['zoom-img', 'img'].join(' ')
   },
+  builderConfig: {
+    resolve: {
+      alias: {
+        '@assets': join(__dirname, 'assets')
+      }
+    }
+  },
   themeConfig: {
     lastUpdated: true,
     socialLinks: [
