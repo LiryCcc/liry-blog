@@ -1,23 +1,28 @@
 import { defineConfig } from 'cspell';
-import { readFileSync } from 'node:fs';
 
 const cspellConfig = defineConfig({
   version: '0.2',
-  ignorePaths: [
-    ...readFileSync('.gitignore')
-      .toString()
-      .split('\n')
-      .filter((v) => {
-        return !v.startsWith('#');
-      }),
-    ...readFileSync('.prettierignore')
-      .toString()
-      .split('\n')
-      .filter((v) => {
-        return !v.startsWith('#');
-      })
-  ],
-  words: ['Liskov']
+  ignorePaths: ['pnpm-lock.yaml', 'packages/blog-rspress/dist', 'packages/blog-next/out'],
+  words: [
+    'Liskov',
+    'rspack',
+    'rspress',
+    'liry',
+    'shiki',
+    'qrcode',
+    'leetcode',
+    'wechat',
+    'kimi',
+    'codingman',
+    'jsbridge',
+    'ahooks',
+    'unocss',
+    'cicd',
+    'vdom',
+    'shadcn',
+    'webcomponents',
+    'shadowdom'
+  ]
 });
 
 export default cspellConfig;
