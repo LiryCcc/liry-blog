@@ -9,6 +9,7 @@ const cspellConfig = defineConfig({
     'rspress',
     'liry',
     'shiki',
+    'TTFB',
     'qrcode',
     'leetcode',
     'wechat',
