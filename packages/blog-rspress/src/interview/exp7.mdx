@@ -2,7 +2,118 @@
 
 ## 八股
 
-### `react` 17 18 区别
+### `react` 17 升级点
+
+#### `jsx`在16中会编译为`React.createElement`，在17有新的`jsx`转换，不再需要在文件内部引入`React`
+
+#### 事件委托，17将事件委托从`document`上移到`root`上
+
+#### 由于事件委托位置变化，只会在`react`树内部冒泡，不会传播到外部
+
+#### `React` 17 改进了错误边界的行为，确保在捕获错误后能更可靠地重置组件状态。
+
+1.  错误边界是`react`组件，用于捕捉并处理子组件树中的`js`错误，防止整个应用崩溃
+
+2.  在react16及之前，通过`componentDidCatch`生命周期捕获错误，react17在此基础上增强了状态管理的可靠性
+
+3.  react17中，引入更严格的状态管理机制：确保错误捕获后组件状态会被重置到稳定状态，未完成的副作用被正确处理，避免遗留状态
+
+4.  react17的错误传播中，promise或者setTimeout中抛出的错误能被更可靠地捕获，同时多层错误边界的嵌套行为更加一致，避免错误穿透传播
+
+5.  react17鼓励使用 getDerivedStateFromError 静态方法处理错误后的 UI 降级，与 componentDidCatch 配合更紧密
+
+#### react17中可以使用 getDerivedStateFromError：替代部分 componentDidCatch 的状态更新逻辑。
+
+### `react` 18 升级点
+
+#### 并发渲染
+
+通过`createRoot`创建根节点，开启并发渲染
+
+```tsx
+import { createRoot } from 'react-dom/client';
+const root = createRoot(document.getElementById('root'));
+root.render(<App />);
+```
+
+自动支持以下特性
+
+1. 时间切片，进行可中断渲染，让复杂ui渲染不会阻塞主进程，保持页面的响应性
+
+2. 过渡渲染，将更新标记为“紧急”和“非紧急”，有限处理用户交互。`useTransition`钩子可以标记更新为非紧急
+
+```tsx
+// 默认的状态更新为紧急更新
+const [id, setId] = useState(0);
+setId(id + 1);
+
+// 使用 useTransition 标记为非紧急更新
+const [isPending, startTransition] = useTransition();
+startTransition(() => {
+  setId(id + 1);
+});
+```
+
+#### 新的渲染api`createRoot`代替`render`，自动支持并发模式
+
+```tsx
+// createRoot 新
+import { createRoot } from 'react-dom/client';
+const root = createRoot(document.getElementById('root')!);
+root.render(<App />);
+```
+
+```tsx
+// render 新
+import { render } from 'react-dom/client';
+render(<App />, document.getElementById('root')!);
+```
+
+#### 自动批处理
+
+react18扩大了批处理的范围，将多次状态更新合并为一次渲染，减少不必要的渲染次数
+
+```tsx
+// 自动批处理
+import { useState } from 'react';
+const App = () => {
+  const [count, setCount] = useState(0);
+  const [name, setName] = useState('React');
+  const handleClick = () => {
+    setCount(count + 1); // 不会立即渲染
+    setName('React 18'); // 不会立即渲染
+    // 在事件处理函数结束后，react会自动批处理这两个状态更新
+  };
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <p>Name: {name}</p>
+      <button onClick={handleClick}>Update</button>
+    </div>
+  );
+};
+```
+
+#### 流式服务端渲染（Streaming SSR）
+
+React 18 改进了服务端渲染（SSR），支持：
+
+选择性 hydration：优先渲染可见内容，提高首屏加载速度。
+流式传输：分块传输 HTML，减少 TTFB（Time To First Byte）。
+
+#### 新的hooks钩子
+
+##### `useId`
+
+生成唯一的id，适用于服务端渲染和客户端渲染，确保水合的时候环境匹配
+
+##### `useTransition`
+
+标记更新为非紧急，适用于过渡渲染
+
+##### `useDeferredValue`
+
+延迟更新值，适用于非紧急状态更新
 
 ### `mobx` `redux`区别，用途，优缺点，为什么选择`mobx`
 
@@ -29,3 +140,7 @@
 ### `Promise` 依次调用，并带有重试次数
 
 返回失败的`Promise`和或者最后一个`Promise`的结果
+
+```
+
+```
