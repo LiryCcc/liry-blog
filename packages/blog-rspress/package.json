@@ -11,14 +11,14 @@
   },
   "dependencies": {
     "dayjs": "^1.11.13",
-    "rspress": "^1.44.0"
+    "rspress": "^1.45.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.30.1",
-    "@rspress/plugin-shiki": "^1.44.0",
-    "@types/node": "^18.19.115",
-    "eslint": "^9.30.1",
+    "@eslint/js": "^9.32.0",
+    "@rspress/plugin-shiki": "^1.45.0",
+    "@types/node": "^18.19.120",
+    "eslint": "^9.32.0",
     "globals": "^15.15.0",
-    "typescript-eslint": "^8.35.1"
+    "typescript-eslint": "^8.38.0"
   }
 }
