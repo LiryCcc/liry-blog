@@ -1,8 +1,12 @@
-import { useRef } from 'react';
+import { Link } from 'react-router';
 
 const Home = () => {
-  const ref = useRef<HTMLDivElement>(null);
-  return <div ref={ref}>{'memory-leak'}</div>;
+  return (
+    <div>
+      <header>{'这里放一些bug的例子'}</header>
+      <Link to={'/ref-memory-leak'}>{'内存泄漏'}</Link>
+    </div>
+  );
 };
 
 export default Home;
