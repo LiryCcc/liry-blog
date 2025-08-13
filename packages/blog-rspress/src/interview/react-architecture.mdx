@@ -71,19 +71,13 @@ class ErrorBoundary extends Component<Props, State> {
 export default ErrorBoundary;
 ```
 
-## 16新特性
-
-## 17新特性
-
-## 18新特性
-
 ## fiber
 
 ### 产生背景
 
 由于最初的架构处理ui更新时时同步阻塞的，每一次更新都会从根节点遍历整个组件树，从而造成单次渲染事件过长，缺乏优先级管理，中断和恢复困难的问题，因此推出了fiber这个新架构
 
-传统架构的性能瓶颈在于
+### 性能瓶颈
 
 1. 同步递归渲染造成阻塞
 
@@ -92,5 +86,109 @@ export default ErrorBoundary;
 2. 缺少优先级管理
 
    传统架构不发根据任务的重要性分配优先级，因此关键任务可能被不重要的任务阻塞
+
+3. 内存管理
+
+   传统架构中完整的组件树被存在内存中，需要保持在内存中直到更新完成，或者被卸载，使用fiber架构后，组件树被拆分为多个fiber，每个fiber代表一个组件，互相独立，可以增量处理，也可以单独回收
+
+4. 总结如下
+
+   | 问题       | 传统架构           | fiber架构        |
+   | ---------- | ------------------ | ---------------- |
+   | 更新机制   | 同步递归，不可中断 | 异步递归，可中断 |
+   | 任务调度   | 无优先级           | 支持优先级调度   |
+   | 用户响应   | 大更新会阻塞交互   | 保持响应性       |
+   | 动画流畅度 | 容易掉帧           | 流畅             |
+   | 内存使用   | 峰值高             | 平滑             |
+   | 错误边界   | 难以实现           | 原生支持         |
+
+### 解决的问题
+
+1. 提高性能：通过增量渲染和任务分片等技术提高性能，减少长时间渲染任务对用户体验的影响
+
+2. 灵活性和扩展性：fiber架构为未来的新特性和优化奠定了基础，例如concurrent mode和suspense，这些新特性进一步提高了react应用的性能和开发体验
+
+3. 可维护性和可调试性
+
+### 基本概念
+
+fiber是一种描述组件树的数据结构，代表一种可中断、可恢复的渲染任务，
+通过将渲染分解为多个小任务，使其可以中断，并且根据需要重新调度任务，
+fiber通过更好的利用浏览器的空闲时间，提高性能和用户体验
+
+### 数据结构
+
+```tsx
+const fiberNode = {
+  stateNode: new ClickCounter(),
+  type: clickCounter,
+  alternate: null,
+  key: null,
+  updateQueue: null,
+  memoizedState: { count: 0 },
+  pendingProps: {},
+  memoizedProps: {},
+  tag: 1,
+  effectTag: 0,
+  nextEffect: null
+};
+```
+
+fiber节点是一个js对象，用于描述组件树的状态和结构，
+每个节点都包含了与组件相关的信息，比如类型、props、状态、effect等。
+同时还包含了指向子、兄弟和父节点的引用，以构建层级结构。
+这样的数据结构让react可以高效的管理组件树的更新和渲染过程。
+
+### 创建过程
+
+1. 通过jsx构建vdom树，表示整个组件树的结构
+
+2. 通过vdom树构建fiber树，表示组件树在渲染过程中的状态和结构
+
+3. 执行初次渲染，react会从根节点开始递归遍历fiber树，执行组件的生命周期方法和渲染函数，将组件树渲染到dom中
+
+### 更新过程
+
+当组件状态或属性发生变化的时候，主要包括如下步骤
+
+1. 触发更新：当组件的状态或参数变化后，调用相应的更新函数，标记组件为待更新状态
+
+2. 生成新的vdom树：会根据新的状态和属性生成一棵新的vdom树，表示组件的更新后状态
+
+3. 协调新旧树：使用协调算法比较新旧两棵树的差异，找出需要更新的部分
+
+4. 执行更新：根据协调结果，更新fiber树的节点，执行对应的渲染函数，将更新后的组件树渲染到dom
+
+5. 提交更新：将更新后的dom树提交给浏览器，并等待浏览器刷新屏幕
+
+## 双缓存
+
+### 介绍
+
+react中双缓存用于解决ui渲染过程中的渲染和不连续问题。
+传统的渲染会直接修改dom，容易看到中间状态的ui，造成不连续和不稳定问题。
+双缓存通过维护两份ui状态，一份用于渲染当前帧，一份计算下一帧的状态，
+从而避免了直接在dom上进行更新操作
+
+### 双缓存fiber树
+
+最多会同时存在两颗fiber树，屏幕显示的称为current fiber，
+正在内存中构建的成为workInProgress fiber树。
+
+current和workInProgress的fiber节点通过alternate属性连接
+
+```js
+currentFiber.alternate === workInProgressFiber; // true
+workInProgressFiber.alternate === currentFiber; // true
+```
+
+react应用的根节点通过切换current指针在不同fiber树之间切换来完成current fiber树的切换，
+每次状态更新都会产生新的workInProgress树，通过指针的切换，完成dom更新
+
+### mount时
+
+文档写的是`RectDOM.render(element, container)`
+
+### update时
 
 ## 并发
