@@ -2,7 +2,7 @@ import { defineConfig } from 'cspell';
 
 const cspellConfig = defineConfig({
   version: '0.2',
-  ignorePaths: ['pnpm-lock.yaml', 'packages/blog-rspress/dist', 'packages/blog-next/out'],
+  ignorePaths: ['pnpm-lock.yaml', 'packages/blog-rspress/dist', 'packages/blog-next/out', '*.svg'],
   words: [
     'Liskov',
     'rspack',
