@@ -10,15 +10,15 @@
     "preview": "rspress preview"
   },
   "dependencies": {
-    "dayjs": "^1.11.13",
-    "rspress": "^1.45.0"
+    "dayjs": "^1.11.18",
+    "rspress": "^1.45.5"
   },
   "devDependencies": {
-    "@eslint/js": "^9.32.0",
-    "@rspress/plugin-shiki": "^1.45.0",
-    "@types/node": "^18.19.120",
-    "eslint": "^9.32.0",
+    "@eslint/js": "^9.35.0",
+    "@rspress/plugin-shiki": "^1.45.5",
+    "@types/node": "^18.19.124",
+    "eslint": "^9.35.0",
     "globals": "^15.15.0",
-    "typescript-eslint": "^8.38.0"
+    "typescript-eslint": "^8.43.0"
   }
 }
