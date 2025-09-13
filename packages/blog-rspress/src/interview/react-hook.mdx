@@ -326,6 +326,145 @@ useEffect(() => {
 }, []);
 ```
 
+### `useCallback` 用于在多次渲染中缓存函数的`react` `hook`
+
+#### 介绍
+
+会在依赖不变的情况下，返回同一个函数引用，从而壁面函数在每次渲染时都被重新创建
+
+函数也是js的引用类型，所以在react每次渲染的时候，同样的函数表达式实际上会生成新的引用
+
+```ts
+const App = () => {
+  const handleClick = () => {
+    console.log('click');
+  };
+};
+```
+
+这种新引用在某些情况下会导致子组件重复渲染，或者引发不必要的`useEffect`执行。
+
+#### 使用
+
+语法:
+
+```ts
+const memoizedCallback = useCallback(fn, [...deps]);
+```
+
+fn: 你想缓存的回调函数
+
+deps: 缓存函数的依赖数组，只有当依赖变化的时候，才会返回新的函数引用
+
+返回值：函数引用
+
+例子：
+
+```ts
+const [count, setCount] = useState(0);
+const handleClick = useCallback(() => {
+  console.log(count);
+}, [count]);
+```
+
+- 当`count`变化时，`handleClick`会重新创建
+- 当`count`不变时，`handleClick`始终引用同一个函数对象
+
+#### 为什么需要`useCallback`
+
+每次重复渲染的时候，所有内部的变量和函数都会重新创建
+
+```tsx
+const Parent = () => {
+  const handleClick = () => {
+    console.log('click');
+  };
+  return <Child handleClick={handleClick} />;
+};
+```
+
+- 对浏览器来说，这个`onClick`每次都是一个新的函数引用
+- 如果`Child`是`memo()`包装的，即使逻辑上没变，props引用变化仍然会导致Child重新渲染
+- 同样如果依赖数组中有函数引用，也会导致`useEffect`/`useMemo`重复执行
+
+`useCallback`会让函数在依赖不变时引用保持稳定，从而避免这些额外渲染或副作用
+
+#### 原理
+
+`useCallback(fn, deps)`相当于
+
+```js
+const useCallback = (fn, deps) => {
+  return useMemo(() => fn, deps);
+};
+```
+
+也就是说：
+
+- React 会记住上一次的 fn 以及依赖数组 deps
+- 新渲染时，如果 deps 没变，直接返回旧的 fn 引用
+- 如果依赖变化，返回新的 fn 引用并保存
+
+{/* todo */}
+
+#### 使用场景
+
+- 防止子组件不必要的渲染
+
+```tsx
+const Child = memo(({ onClick }) => {
+  console.log('Child render');
+  return <button onClick={onClick}>Click</button>;
+});
+
+function Parent() {
+  const [count, setCount] = useState(0);
+
+  const handleClick = useCallback(() => {
+    console.log('clicked');
+  }, []); // 不依赖 count
+
+  return (
+    <>
+      <Child onClick={handleClick} />
+      <button onClick={() => setCount(count + 1)}>+1</button>
+    </>
+  );
+}
+```
+
+    - 如果不用`useCallback`，每次Parent渲染onClick都是新引用，Child会重渲染
+
+    - 用了后Child引用稳定，不会重复渲染
+
+- 保证`useEffect`/`useMemo`等依赖数组不会因为函数引用变化频繁触发
+
+```ts
+useEffect(() => {
+  fetchData();
+}, [fetchData]); //使用useCallback包装的fetchData不变，就不会重复触发副作用
+```
+
+- 配合稳定引用的缓存
+
+```tsx
+const columns = useMemo(() => [{ title: 'name', render: (row) => <Cell onClick={handleClick} /> }], [handleClick]);
+```
+
+#### 误区
+
+- 所有函数都需要useCallback包裹
+
+不要
+
+是性能优化工具，有记忆成本，让一个一函数不是传给子组件当props或者作为依赖，就不需要useCallback包裹
+
+react的hook是以链表形式存储的，使用useCallback或增加链表遍历次数
+
+- 当成防闭包工具
+
+useCallback不能自动获取最新的state，只会缓存当时生成函数的闭包，如果总是需要最新值，则需要用useRef或是函数式更新
+
 ### `useContext` 订阅 `react context` ，避免 `props` 层层传递
 
 ## 额外的hook
