@@ -1,5 +1,254 @@
 # `react` `hooks` 讲
 
+## `react`中的闭包
+
+### 闭包
+
+闭包就是一个函数记住了它定义时候的作用域，即使这个函数在定义环境之外执行，也能访问到原本作用域中的变量。
+
+```js
+const outer = () => {
+  let count = 0;
+  const inner = () => {
+    console.log(count);
+  };
+};
+
+const f = outer();
+
+f(); // 0
+```
+
+### `react`为什么会遇到闭包问题
+
+因为函数组件就是一个普通的函数，每次渲染的时候都会重新调用，渲染时用到的所有变量和state，都会在一次调用中固化下来
+
+因此：
+
+1. 每次渲染都会重新创建闭包，捕获当时的`props`/`state`值
+
+2. 之后再事件回调或是监听器中调用这个闭包的时候，拿到的都是当时捕获的变量值，不是更新后的新值
+
+### 典型问题
+
+最典型的问题
+
+```tsx
+const App = () => {
+  const [count, setCount] = useState(0);
+
+  function alertCount() {
+    setTimeout(() => {
+      alert(count);
+    }, 3000);
+  }
+
+  return (
+    <>
+      <p>{count}</p>
+      <button onClick={() => setCount(count + 1)}>加一</button>
+      <button onClick={alertCount}>3秒后弹出 count</button>
+    </>
+  );
+};
+```
+
+弹出的时执行alertCount中的count值，而不是最新的count值，为了解决这个问题
+
+原因：
+
+- 当 alertCount 在第一次渲染（或某次渲染）中被定义时，它捕获的是当时的 count
+
+- 即使 3 秒后 count 的 state 改变了，这个闭包里的 count 依然是那个旧值
+
+### 最常见的闭包问题
+
+1. `useEffect`省略依赖
+
+```ts
+const [count, setCount] = useState(0);
+useEffect(() => {
+  const timer = setTimeout(() => {
+    console.log(count);
+  }, 1000);
+}, []); // 没有依赖
+```
+
+改为
+
+```ts
+const [count, setCount] = useState(0);
+useEffect(() => {
+  const timer = setTimeout(() => {
+    console.log(count);
+  }, 1000);
+}, [count]);
+```
+
+2. `setInterval`/`setTimeout` 闭包问题
+
+回调调用了旧的state/props值
+
+```tsx
+import { useState, useEffect } from 'react';
+
+const App = () => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      console.log('count in interval:', count);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []); // ❌ 空依赖数组，只在挂载时创建一次定时器
+
+  return (
+    <div>
+      <p>{count}</p>
+      <button onClick={() => setCount(count + 1)}>加1</button>
+    </div>
+  );
+};
+```
+
+改为
+
+```tsx
+const App = () => {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    const timer = setInterval(() => {
+      console.log('count in interval:', timer);
+    });
+  }, [count]);
+  return (
+    <div>
+      <p>{count}</p>
+      <button onClick={() => setCount(count + 1)}>加1</button>
+    </div>
+  );
+};
+```
+
+这样就可以解决问题
+
+3. 事件回调
+
+回调定义的时候捕获了旧值，触发时用的还是旧值
+
+```tsx
+const App = () => {
+  const [count, setCount] = useState(0);
+
+  function handleClickLater() {
+    setTimeout(() => {
+      alert('count: ' + count); // 可能是旧值
+    }, 3000);
+  }
+
+  return (
+    <div>
+      <p>{count}</p>
+      <button onClick={() => setCount(count + 1)}>加1</button>
+      <button onClick={handleClickLater}>三秒后弹出 count</button>
+    </div>
+  );
+};
+```
+
+改为
+
+```ts
+const handleClickLater = useCallback(() => {
+  setTimeout(() => {
+    alert('count: ' + count);
+  }, 3000);
+}, [count]); // ✅ 每次 count 变，重建回调
+```
+
+4. 异步回调
+
+`Promise resolve` 之后回调闭包里也是旧值
+
+```tsx
+const App = () => {
+  const [name, setName] = useState('初始值');
+
+  function fetchData() {
+    fakeRequest().then(() => {
+      alert('name: ' + name); // 旧的 name
+    });
+  }
+
+  return (
+    <div>
+      <p>{name}</p>
+      <button onClick={() => setName('更新值')}>更新 name</button>
+      <button onClick={fetchData}>发请求</button>
+    </div>
+  );
+};
+
+const fakeRequest = () => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, 3000); // 模拟3秒后返回
+  });
+};
+```
+
+改为
+
+```ts
+const nameRef = useRef(name);
+
+useEffect(() => {
+  nameRef.current = name;
+}, [name]);
+
+const fetchData = () => {
+  fakeRequest().then(() => {
+    alert('name: ' + nameRef.current); // ✅ 最新 name
+  });
+};
+```
+
+### 解决方法
+
+1. 把变量加入依赖数组
+
+2. 使用函数式更新，让`state`的更新基于最新之计算，而不依赖闭包捕获的旧值，这样即使闭包捕获了旧的`count`，也可以使用回调参数拿到最新的`state`
+
+3. 使用`useRef`存储最新值
+
+4. 使用`useCallback`保持回调引用稳定
+
+### 对`react`闭包的理解
+
+把每次渲染看成一次快照
+
+- `props`、`state`、定义的函数和变量等都是这次渲染的快照副本
+
+- 在渲染外部延迟执行的回调，不会自动更新到最新快照
+
+- 想用到最新值，要么重新生成回调，要么使用`ref`持有最新状态
+
+### 总结
+
+1. 本质
+
+本质是每次渲染的时候函数组件会创建一套新的变量环境，回调会捕获当时的值，之后不随`state`/`props`自动更新
+
+2. checklist
+
+- 副作用依赖数组写全、这样一直用最新值
+
+- `state`尽量用函数式更新
+
+- 在需要永远使用最新值的地方用`useRef`
+
+- 明确某个回调是否要随值更新而更新
+
 ## 基础
 
 ### `useState` 在函数组件中添加局部状态
