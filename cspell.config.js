@@ -22,7 +22,8 @@ const cspellConfig = defineConfig({
     'vdom',
     'shadcn',
     'webcomponents',
-    'shadowdom'
+    'shadowdom',
+    'rsdoctor'
   ]
 });
 

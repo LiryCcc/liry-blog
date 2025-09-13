@@ -2,6 +2,237 @@
 
 ## `react`项目优化
 
+### 1. 组件渲染优化
+
+react最大的性能开销在**不必要的重复渲染**，所以组件优化的重点就是减少不必要的render
+
+#### 1. 使用React.memo包裹组件，只有props变化才重新渲染
+
+会对函数组件进行千层的props对比，只有props变化才重新渲染
+
+```tsx
+const MyComponent = React.memo(({ name }: { name: string }) => {
+  console.log(`render`);
+  return <div>{name}</div>;
+});
+```
+
+#### 2. 使用useCallback/useMemo包裹组件，只有依赖项变化才重新渲染
+
+```ts
+const handleClick = useCallback(() => {
+  console.log(`click`);
+}, []);
+
+const computedValue = useMemo(() => heavyCompute(data), [data]);
+```
+
+### 2. 状态管理优化
+
+状态放置不当就会引起过多的组件树更新，关键是**状态就近管理**
+
+优化点:
+
+- 不要把所有的状态都放在项目顶层或是全局store
+- 把局部状态放到组件内部，减少不相关子组件的重新渲染
+
+### 3. 渲染层优化
+
+#### 1. 长列表渲染，使用虚拟列表
+
+如果有上百个dom节点，首屏渲染和滚动性能都会受到影响
+
+#### 2. 代码分割
+
+使用React.lazy和Suspense按需加载，不一次性加载全部js
+
+```ts
+import { lazy } from 'react';
+
+const About = lazy(() => import('@/pages/about'));
+```
+
+路由分包可以用react-router 配合lazy
+
+#### 3. 按需加载lodash
+
+例如只加载lodash的部分方法
+
+import { debounce } from 'lodash/debounce';
+
+### 4. 避免昂贵的计算频繁执行
+
+- 缓存计算结果（useMemo）
+
+- 对频繁触发的事件做防抖/节流
+
+```ts
+const onScroll = useCallback(
+  debounce(() => {
+    console.log('sc');
+  }, 200),
+  []
+);
+```
+
+### 5. 异步和Suspense优化
+
+数据加载用分页、懒加载、缓存
+
+避免每次渲染都发起相同请求
+
+react18的并发特性和suspense可以更加流畅的加载数据
+
+### 6. 构建和打包优化
+
+#### 1. tree-shaking
+
+确保es module 导入，减少无用代码
+
+在package.json加载sideEffects: false
+
+#### 2. 生产环境优化
+
+1. 开启gzip压缩
+
+2. 构建开启代码minify
+
+#### 3. 图片优化
+
+1. 使用webp，并且按需加载
+
+2. 使用雪碧图或是分辨率自适应
+
+### 7. useDeferredValue 和 useTransition
+
+- 自动批处理（Automatic Batching）：减少 state 更新次数。
+- Transition：标记低优先级 UI 更新，避免阻塞交互。
+- useDeferredValue / useTransition：在搜索、输入场景避免卡顿。
+
+### 8. 使用性能监控工具
+
+- react devtools中的profiler分析组件渲染次数和耗时
+
+- light house测量首屏性能
+
+- 使用rsdoctor检查打包体积
+
+## useDeferredValue和useTransition
+
+### 总结
+
+首先这两个都是react 18中引入的新hook，都和并发特性有关，用于优化ui在更新时的流畅性，不过他们的使用场景、调用方式有区别
+
+react中，如果某个状态更新涉及复杂计算或导致大列表渲染，会让页面卡顿
+
+react18中，引入了可中断渲染的能力，也就是并发模式，通过useTransition和useDeferredValue这类api，让开发者可以标记更新的优先级，提升交互体验
+
+### useTransition
+
+- 用于延迟渲染一些非紧急的ui更新
+
+- 用来包裹某些状态更新，让react在有空的时候在执行，保证高优先级的ui能立刻响应
+
+```ts
+const [isPending, startTransition] = useTransition();
+
+const handleChange = (e) => {
+  const { value } = e.target;
+  setInputValue(value);
+  startTransition(() => {
+    setFilteredData(bigData.filter((item) => item.includes(value)));
+  });
+};
+```
+
+工作流程：
+
+1. `setInputValue`是紧急更新 -> 立即生效，保证输入框不卡顿
+
+2. `setFilteredData`是低优先级更新->可以被中断/延后
+
+3. `isPending`表示低优先级更新正在进行中，可用于显示加载状态
+
+底层原理
+
+- 调用 startTransition 时，React 会：
+  1. 临时将渲染优先级降为 低优先级
+  2. 执行你传入的 setState 等操作
+  3. 恢复原优先级
+- 调度层（Scheduler）将这些更新排在低优先级队列中，并允许它们被高优先级任务打断/覆盖。
+- 如果低优先级更新长时间没执行，React 可选择在空闲时（requestIdleCallback 或宏任务间隙）去执行它。
+
+### useDeferredValue
+
+- 让一个只延迟同步
+
+- 当一个状态会引发大量计算或渲染时，可以用useDeferredValue创建它的延迟版本，避免状态变化立即触发重渲染，提高交互流畅性
+
+```js
+function useDeferredValue(value) {
+  const [deferred, setDeferred] = useState(value);
+  const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    startTransition(() => {
+      setDeferred(value);
+    });
+  }, [value]);
+
+  return deferred;
+}
+```
+
+- 你的组件继续用 deferredValue，而不是直接用 value
+- 当 value 改变时，deferredValue 会“慢一拍”更新（低优先级）
+- 这允许 React 先响应其他紧急更新（例如继续输入文本）
+
+底层原理
+
+- 内部其实是用 useTransition + 状态缓存 的组合概念。
+- 当源值 value 变化时：
+  1. React 先返回旧的 deferredValue（所以渲染不会立即更新成新值）
+  2. 同时发起一个低优先级的更新，将 deferredValue 更新为新的 value
+
+### 两者对比
+
+| 特性               | `useTransition`                                  | `useDeferredValue`                                |
+| ------------------ | ------------------------------------------------ | ------------------------------------------------- |
+| api作用            | 给一堆更新降低优先级                             | 给某个值的变化降低优先级                          |
+| 本质               | 修改调度优先级，让函数里面的更新进入低优先级队列 | 用一个内部状态保持旧值，再用useTransition延迟更新 |
+| 是否显式调用       | 需要手动用`startTransition`                      | 不需要，自动延迟值变化                            |
+| 用途               | 手动选择哪些更新标记为低优先级                   | 自动给某个计算量大的值延迟更新                    |
+| 返回值             | `[isPending, startTransition]`                   | `deferredValue`                                   |
+| 是否能控制延迟范围 | 可以，包裹具体更新逻辑                           | 不行，只对整个值生效                              |
+| 常见用例           | 输入时过滤数据，大量dom渲染的状态更新            | 输入值引发的大计算结果、搜索建议等                |
+
+### 为什么能减少卡顿
+
+根本在于改变了优先级调度策略
+
+- 让高优先级不被低优先级渲染阻塞
+
+- 让后台渲染可以被中断和恢复
+
+- 让ui具备响应优先的特性
+
+### 原理，如何捕获错误
+
+React 18 内部引入了 时间切片（Time Slicing） 和 更新优先级调度（Priority Scheduling）：
+
+- 在旧的同步渲染模式下（React 17 及以前），setState 会同步触发更新，一旦开始渲染就不能被打断。
+- 在并发模式下，React 会将渲染拆分成可中断的“工作单元（work units）”，并为不同更新赋予优先级：
+  - 同步优先级 (Sync)：立即执行（例如输入框移动光标）
+  - 用户阻塞优先级 (UserBlocking)：比如点击按钮，期望尽快反馈
+  - 普通优先级 (Normal)：普通的 UI 更新
+  - 低优先级 (Low)：影响不大的渲染，可以延迟
+  - 闲置优先级 (Idle)：没事做时才执行
+
+- React 内部用 Scheduler 模块对任务队列进行管理：
+  1. 不同更新被打标签（优先级）
+  2. 高优先级任务先执行
+  3. 低优先级任务可以被打断和延后
+
 ## `react state`执行机制
 
 ## `useCallback`
