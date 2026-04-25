@@ -51,3 +51,44 @@
     允许的源，可以是 \* 代表所有
 
   - `access-control-allow-methods: GET,POST,PUT`
+
+### `jsonp`
+
+- 原理: `script`标签不受跨域影响，所以就可以规避跨域限制
+
+- 步骤
+
+1. 准备一个callback函数用来接收返回数据
+
+2. 创建一个script标签用来发起请求
+
+3. 等待返回结果
+
+```html
+<script>
+  window.callback = (data) => {
+    console.log(data);
+  };
+</script>
+<script src="https://example.com/jsonp?callback=callback"></script>
+```
+
+4. 调用callback函数返回响应体
+
+假如返回的数据为
+
+```json
+{
+  "a": 1,
+  "b": 2
+}
+```
+
+则script请求到的是
+
+```js
+callback({
+  a: 1,
+  b: 2
+});
+```
